@@ -34,12 +34,14 @@ import md5
 import time
 import dbhash
 import re
+import requests
 
 try: 
     from xml.sax.saxutils import escape
 except:
     def escape(data):
         return data.replace("&","&amp;").replace(">","&gt;").replace("<","&lt;")
+
 
 # Version information (for generator headers)
 VERSION = ("Planet/%s +http://www.planetplanet.org" % __version__)
@@ -604,7 +606,8 @@ class Channel(cache.CachedInfo):
         This does the actual work of pulling down the feed and if it changes
         updates the cached information about the feed and entries within it.
         """
-        info = feedparser.parse(self.url,
+        response = requests.get(self.url)
+        info = feedparser.parse(response.content,
                                 etag=self.url_etag, modified=self.url_modified,
                                 agent=self._planet.user_agent)
         if info.has_key("status"):
